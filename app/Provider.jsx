@@ -32,16 +32,17 @@ export default function UserDetailProvider({ children }) {
       try {
         const parsed = JSON.parse(storage);
         if (parsed?.email) {
+          parsed.email = parsed.email.toLowerCase(); // Normalize email
           setUserDetail(parsed);
         } else {
-          router.push('/login'); // Redirect if no email
+          router.push('/login');
         }
       } catch (error) {
         console.error('Error parsing userDetail:', error);
         router.push('/login');
       }
     } else {
-      router.push('/login'); // Redirect if no user
+      router.push('/login');
     }
   }, [router]);
 
@@ -50,11 +51,13 @@ export default function UserDetailProvider({ children }) {
   }, [emailTemplate]);
 
   useEffect(() => {
-    if (selectedElement) {
+    if (selectedElement && selectedElement.layout && selectedElement.index !== undefined) {
       const updatedEmailTemplates = emailTemplate.map((item) =>
         item.id === selectedElement?.layout?.id ? selectedElement.layout : item
       );
-      setEmailTemplate(updatedEmailTemplates);
+      if (JSON.stringify(updatedEmailTemplates) !== JSON.stringify(emailTemplate)) {
+        setEmailTemplate(updatedEmailTemplates);
+      }
     }
   }, [selectedElement, emailTemplate]);
 

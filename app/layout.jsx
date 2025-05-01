@@ -1,6 +1,7 @@
 import UserDetailProvider from './Provider';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import "./globals.css";
+import { Toaster } from '@/components/ui/sonner';
 
 export default function RootLayout({ children }) {
   return (
@@ -11,6 +12,7 @@ export default function RootLayout({ children }) {
             {children}
           </UserDetailProvider>
         </GoogleOAuthProvider>
+        <Toaster />
       </body>
     </html>
   );
