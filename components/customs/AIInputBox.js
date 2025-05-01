@@ -1,3 +1,4 @@
+// components/customs/AIInputBox.js
 "use client";
 import React, { useState } from "react";
 import { Textarea } from "../ui/textarea";
@@ -10,6 +11,7 @@ import { useUserDetail } from '@/context/UserDetailContext';
 import { api } from "@/convex/_generated/api";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from 'sonner';
 
 export default function AIInputBox() {
   const [userInput, setUserInput] = useState("");
@@ -39,7 +41,6 @@ export default function AIInputBox() {
           for (let i = 0; i < layout.numOfCol; i++) {
             if (layout[i] && typeof layout[i] === 'object') {
               if (!layout[i].type || !['Button', 'Text', 'Image', 'Logo', 'Divider', 'LogoHeader', 'SocialIcons'].includes(layout[i].type)) {
-                // Extract meaningful content if possible
                 const content = layout[i].content || layout[i].text || JSON.stringify(layout[i]);
                 layout[i] = {
                   type: 'Text',
@@ -77,19 +78,20 @@ export default function AIInputBox() {
         tid,
         design: design,
         email: normalizedEmail,
-        description: userInput, // Set description to userInput
+        description: userInput,
       });
       const resp = await SaveTemplate({
         tid: tid,
         design: design,
         email: normalizedEmail,
-        description: userInput, // Pass userInput directly
+        description: userInput,
       });
       console.log("SaveTemplate response:", resp);
       router.push('/editor/' + tid);
-      setLoading(false);
     } catch (e) {
       console.error("Error in OnGenerate:", e);
+      toast.error(e.message || "Failed to generate email template. Please try again.");
+    } finally {
       setLoading(false);
     }
   };
