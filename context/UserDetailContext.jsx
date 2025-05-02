@@ -1,3 +1,4 @@
+// context/UserDetailContext.js
 "use client";
 import { createContext, useContext, useState, useEffect } from 'react';
 
@@ -13,8 +14,13 @@ export function UserDetailProvider({ children }) {
     }
   }, []);
 
+  const logout = () => {
+    setUserDetail(null); // Clear userDetail from context
+    localStorage.removeItem('userDetail'); // Clear userDetail from localStorage
+  };
+
   return (
-    <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
+    <UserDetailContext.Provider value={{ userDetail, setUserDetail, logout }}>
       {children}
     </UserDetailContext.Provider>
   );

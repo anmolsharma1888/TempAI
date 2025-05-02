@@ -1,3 +1,4 @@
+// context/UserDetailProvider.js
 "use client";
 import React, { useContext, useEffect, useState } from 'react';
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -7,11 +8,12 @@ import { ScreenSizeContext } from '@/context/ScreenSizeContext';
 import { DragDropLayoutElement } from '@/context/DragDropLayoutElement';
 import { EmailTemplateContext } from '@/context/EmailTemplateContext';
 import { SelectedElementContext } from '@/context/SelectedElementContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 export default function UserDetailProvider({ children }) {
   const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL);
   const router = useRouter();
+  const pathname = usePathname();
   const [userDetail, setUserDetail] = useState(null);
   const [screenSize, setScreenSize] = useState('desktop');
   const [dragElementLayout, setDragElementLayout] = useState();
@@ -32,19 +34,21 @@ export default function UserDetailProvider({ children }) {
       try {
         const parsed = JSON.parse(storage);
         if (parsed?.email) {
-          parsed.email = parsed.email.toLowerCase(); // Normalize email
+          parsed.email = parsed.email.toLowerCase();
           setUserDetail(parsed);
-        } else {
-          router.push('/login');
+        } else if (pathname !== '/') {
+          router.push('/');
         }
       } catch (error) {
         console.error('Error parsing userDetail:', error);
-        router.push('/login');
+        if (pathname !== '/') {
+          router.push('/');
+        }
       }
-    } else {
-      router.push('/login');
+    } else if (pathname !== '/') {
+      router.push('/');
     }
-  }, [router]);
+  }, [router, pathname]);
 
   useEffect(() => {
     localStorage.setItem('emailTemplate', JSON.stringify(emailTemplate));
@@ -64,7 +68,11 @@ export default function UserDetailProvider({ children }) {
   return (
     <ConvexProvider client={convex}>
       <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
-        <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
+        <UserDetailContext.Provider value={{ userDetail, setUserDetail, logout: () => {
+          setUserDetail(null);
+          localStorage.removeItem('userDetail');
+          router.push('/'); // Redirect to homepage after logout
+        }}}>
           <ScreenSizeContext.Provider value={{ screenSize, setScreenSize }}>
             <DragDropLayoutElement.Provider value={{ dragElementLayout, setDragElementLayout }}>
               <EmailTemplateContext.Provider value={{ emailTemplate, setEmailTemplate }}>
