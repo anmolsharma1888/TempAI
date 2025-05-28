@@ -218,7 +218,7 @@ Port Conflicts: <br>
 
 
 Text/Font Editing Issues: <br>
- - Ensure SettingsSidebar.js is correctly linked to the editor (report, page 19).
+ - Ensure SettingsSidebar.js is correctly linked to the editor.
 
 
 
